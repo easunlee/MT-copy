@@ -172,7 +172,7 @@ sub _hdlr_gravatar_url {
        return  'http://static.easunlee.cn/images/ds-avatar.png' if ($email eq '');
               
       require Digest::MD5;
-             $url = "http://gravatar.duoshuo.com/avatar/".Digest::MD5::md5_hex(lc($email)).'?s=50&d=identicon';
+             $url = "http://cn.gravatar.com/avatar/".Digest::MD5::md5_hex(lc($email)).'?s=50&d=identicon';
             #$url .= exists $args->{size} ? "&amp;s=".$args->{size} : "";
             #$url .= exists $args->{rating} ? "&amp;r=".$args->{rating} : "";
             #$url .= exists $args->{default} ? "&amp;d=".uri_escape($args->{default}) : "";
