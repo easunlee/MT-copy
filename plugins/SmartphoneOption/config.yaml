@@ -1,0 +1,95 @@
+# Movable Type (r) (C) 2001-2013 Six Apart, Ltd. All Rights Reserved.
+# This code cannot be redistributed without permission from www.sixapart.com.
+# For more information, consult your Movable Type license.
+#
+# $Id$
+
+name: Smartphone Option
+key: Smartphone
+author_link: http://www.sixapart.com/
+author_name: Six Apart, Ltd.
+description: <MT_TRANS phrase='Provides an iPhone, iPad and Android touch-friendly UI for Movable Type. Once enabled, navigate to your MT installation from your mobile to use this interface.'>
+version: 2.21
+l10n_class: Smartphone::L10N
+
+object_types:
+    author:
+        smartphone_list_prefs: hash meta
+        smartphone_fixed_widgets: hash meta
+
+device_types:
+    iphone:
+        label: iPhone
+        order: 100
+        keyword: iPhone
+        category: smartphone
+        os: ios
+        browser: mobile-safari
+        browser_engine: webkit
+        uploadable: $Smartphone::Smartphone::Device::iOS::uploadable
+    ipad:
+        label: iPad
+        order: 200
+        keyword: iPad
+        category: smartphone
+        os: ios
+        browser: mobile-safari
+        browser_engine: webkit
+        uploadable: $Smartphone::Smartphone::Device::iOS::uploadable
+    android:
+        label: Android
+        order: 300
+        keyword: android
+        category: smartphone
+        os: android
+        browser: android-browser
+        browser_engine: webkit
+    pc:
+        label: PC
+        order: 9999
+        category: pc
+        os: pc
+        browser: pc
+
+list_properties: $Smartphone::Smartphone::CMS::Listing::load_list_properties
+
+callbacks:
+    MT::Asset::Image::pre_save:
+        handler: $Smartphone::Smartphone::Asset::fix_orientation
+        priority: 1
+
+applications:
+    cms:
+        callbacks:
+            pre_run: $Smartphone::Smartphone::CMS::on_pre_run
+
+            template_param: $Smartphone::Smartphone::CMS::on_template_param
+            template_source.header: $Smartphone::Smartphone::CMS::on_template_source_header
+            template_param.header: $Smartphone::Smartphone::CMS::on_template_param_header
+            template_output.footer: $Smartphone::Smartphone::CMS::on_template_output_footer
+
+            template_param.login: $Smartphone::Smartphone::CMS::on_template_param_login
+
+            template_param.list_entry: $Smartphone::Smartphone::CMS::Listing::on_template_param_list_common
+            template_param.list_common: $Smartphone::Smartphone::CMS::Listing::on_template_param_list_common
+
+            template_param.edit_entry: $Smartphone::Smartphone::CMS::Entry::on_template_param_edit_entry
+            template_source.archetype_editor: $Smartphone::Smartphone::CMS::Entry::on_template_source_archetype_editor
+            template_param.preview_strip: $Smartphone::Smartphone::CMS::Entry::on_template_param_preview_strip
+
+            template_param.list_category: $Smartphone::Smartphone::CMS::Category::on_template_param_list
+
+            template_param.search_replace: $Smartphone::Smartphone::CMS::Search::on_template_param_search_replace
+
+            template_param.dashboard: $Smartphone::Smartphone::CMS::Dashboard::on_template_param_dashboard
+            template_param.this_is_you: $Smartphone::Smartphone::CMS::Dashboard::on_template_param_widget
+            template_param.favorite_blogs: $Smartphone::Smartphone::CMS::Dashboard::on_template_param_blogs_widget
+            template_param.recent_blogs: $Smartphone::Smartphone::CMS::Dashboard::on_template_param_blogs_widget
+
+            template_source.asset_upload: $Smartphone::Smartphone::CMS::Asset::on_template_source_asset_upload
+            cms_asset_upload_path: $Smartphone::Smartphone::Asset::rename_if_exists
+        methods:
+            smartphoneoption_dialog_select_formatted_text:
+                code: $Smartphone::Smartphone::CMS::select_formatted_text
+        device_categories:
+            smartphone: smartphone.yaml

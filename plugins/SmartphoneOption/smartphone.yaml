@@ -1,0 +1,446 @@
+# Movable Type (r) (C) 2001-2013 Six Apart, Ltd. All Rights Reserved.
+# This code cannot be redistributed without permission from www.sixapart.com.
+# For more information, consult your Movable Type license.
+#
+# $Id$
+
+prefs:
+    system_scope_denied: 1
+    hide_administer_access: 1
+    preview_callback: $Smartphone::Smartphone::CMS::Entry::on_smartphone_template_param_preview_strip
+html_head:
+    link:
+        order: 100
+        type: link
+        rel: apple-touch-icon-precomposed
+        file: images/touch-icon-default.png
+        version: ''
+    meta:
+        order: 200
+        html: |
+            <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0">
+            <meta name="format-detection" content="telephone=no" />
+    js_smartphone:
+        order: 300
+        type: js
+        file: jquery/jquery.mt.smartphone.js
+    css_smartphone:
+        order: 400
+        type: css
+        file: css/smartphone.css
+    css_smartphone_dashboard:
+        order: 1000
+        file: css/smartphone/dashboard.css
+        condition: |
+            sub {
+                my ($app, $mode, $type) = @_;
+                $mode eq 'dashboard'? 1: 0;
+            }
+    css_smartphone_list_common:
+        order: 1100
+        file: css/smartphone/list_common.css
+        condition: |
+            sub {
+                my ($app, $mode, $type) = @_;
+                $mode eq 'list'? 1: 0;
+            }
+    css_smartphone_list_category:
+        order: 1200
+        file: css/smartphone/list_category.css
+        condition: |
+            sub {
+                my ($app, $mode, $type) = @_;
+                ( $mode eq 'list' )
+                    && ( $type eq 'category' || $type eq 'folder') ? 1: undef;
+            }
+    css_smartphone_edit_entry:
+        order: 1300
+        file: css/smartphone/edit_entry.css
+        condition: |
+            sub {
+                my ($app, $mode, $type) = @_;
+                ( $mode eq 'view' || $mode =~ 'save' )
+                    && ( $type eq 'entry' || $type eq 'page') ? 1: undef;
+            }
+    css_smartphone_search_replace:
+        order: 1500
+        file: css/smartphone/search_replace.css
+        condition: |
+            sub {
+                my ($app, $mode, $type) = @_;
+                $mode eq 'search_replace'? 1: 0;
+            }
+
+ignored_methods:
+    preview_entry: 1
+supported_methods:
+    _default: 0
+    _types:
+        entry: 1
+        page: 1
+        comment: 1
+        category: 1
+        folder: 1
+        asset: 1
+    dashboard: 1
+    list.blog: 1
+    search_replace: 1
+    search_replace.blog: 1
+    start_rebuild: 1
+    rebuild: 1
+    rebuild_confirm: 1
+    rebuild_phase: 1
+    start_upload:
+        uploadable: 1
+    upload_file:
+        uploadable: 1
+system_methods_white_list:
+    dialog_select_website: 1
+    dialog_select_weblog: 1
+    dialog_list_asset: 1
+    convert_to_html: 1
+    update_widget_prefs: 1
+menus_white_list:
+    blog: 1
+    blog:manage: 1
+    entry: 1
+    entry:manage: 1
+    entry:create: 1
+    entry:category: 1
+    page: 1
+    page:manage: 1
+    page:create: 1
+    page:folder: 1
+    asset: 1
+    asset:manage: 1
+    asset:upload:
+        uploadable: 1
+    feedback: 1
+    feedback:comment: 1
+blog_stats_tabs_white_list:
+    _default: entry
+    entry: 1
+    comment: 1
+dashboard_blog_shortcut:
+    blogs:
+        label: Blogs
+        order: 100
+        blog_scope:
+            __mode: list
+            _type: blog
+        scope: website
+        permit_action: access_to_blog_list
+    entries:
+        label: Entries
+        order: 100
+        scope: blog
+        blog_scope:
+            __mode: list
+            _type: entry
+        permit_action: access_to_entry_list
+    pages:
+        label: Pages
+        order: 200
+        blog_scope:
+            __mode: list
+            _type: page
+        permit_action: access_to_page_list
+    comments:
+        label: Comments
+        order: 400
+        blog_scope:
+            __mode: list
+            _type: comment
+        permit_action: access_to_comment_list
+fixed_widgets:
+    system:
+        - recent_websites
+    user:
+        - this_is_you
+        - favorite_blogs
+    website:
+        - recent_blogs
+    blog:
+        - blog_stats
+edit_entry_fields:
+    # Be care that # in an one string will be assumed as a comment.
+    _default:
+        css: |
+            \#sortable > *,
+            \#quickpost,
+            \#related-content > * {
+                display: none;
+            }
+    status:
+        template: |
+            <__trans_section component="smartphoneoption">
+            <mt:unless name="new_object">
+                <mt:if name="use_revision">
+                    <mt:if name="rev_date">
+                        <mtapp:statusmsg
+                            id="status-field"
+                            class="info no-close right-link"
+                            can_close="0">
+                            <span><__trans phrase="Revision: <strong>[_1]</strong>" params="<mt:var name="rev_date" escape="html">"></span>
+                            <a href="<mt:var name="script_url">?__mode=list_revision&_type=<mt:var name="object_type" default="entry">&id=<$mt:var name="id"$ escape="url">&blog_id=<$mt:var name="blog_id"$>&r=<mt:var name="rev_number" escape="html">" class="mt-open-dialog" title="<__trans phrase="View revisions of this [_1]" params="<mt:var name="object_label">">"><__trans phrase="View revisions"></a>
+                        </mtapp:statusmsg>
+                    </mt:if>
+                </mt:if>
+            </mt:unless>
+            </__trans_section>
+        display: 1
+        as_statusmsg: append
+    title:
+        selector: |
+            \#sortable #title-field
+        display: 1
+    text:
+        selector: |
+            \#sortable #text-field
+        display: 1
+    convert_breaks:
+        selector: |
+            \#sortable #convert_breaks-field
+        display: 1
+        as_field: 1
+    excerpt:
+        selector: |
+            \#sortable #excerpt-field
+        display: 1
+    keywords:
+        selector: |
+            \#sortable #keywords-field
+        display: 1
+    tags:
+        selector: |
+            \#sortable #tags-field
+        display: 1
+    category:
+        selector: |
+            \#related-content #category-field, #sortable #category-field
+        jquery: |
+            // Blinkg to bellow of the format.
+            jQuery('#related-content > #category-field').insertAfter(jQuery('#sortable > #convert_breaks-field'));
+        display: 1
+    _customfields:
+        display: 1
+    publish:
+        selector: |
+            \#entry-publishing-widget
+        display: 0
+        css: |
+            \#related-content #status-field,
+            \#related-content #authored_on-field,
+            \#related-content #basename-field,
+            \#related-content #revision-note-field,
+            \#related-content .actions-bar {
+                display: block;
+            }
+        jquery: |
+            // Bring to the last and develop outside widget.
+            jQuery('#related-content').append(jQuery('#entry-publishing-widget'));
+            jQuery('#entry-publishing-widget')
+                .before(jQuery('#entry-publishing-widget .widget-content > *'));
+
+search_apis_white_list:
+    blog: 1
+    entry: 1
+    page: 1
+    comment: 1
+    asset: 1
+search_replace_prefs:
+    add_select_all_button: 1
+    can_replace: 0
+    title_by_type: 1
+    disable_list_actions: 1
+    ellipsis_text: 1
+listing_screens_transform:
+    blog:
+        fixed_columns:
+            smartphone_main: 1
+            smartphone_sub: 1
+        per_page_on_footer: 1
+        add_select_all_button: 1
+    entry:
+        fixed_columns:
+            smartphone_main: 1
+            smartphone_sub: 1
+        per_page_on_footer: 1
+        add_select_all_button: 1
+        actions_gather_as: list
+    page:
+        fixed_columns:
+            smartphone_main: 1
+            smartphone_sub: 1
+        per_page_on_footer: 1
+        add_select_all_button: 1
+        actions_gather_as: list
+    comment:
+        fixed_columns:
+            smartphone_main: 1
+            smartphone_sub: 1
+        per_page_on_footer: 1
+        add_select_all_button: 1
+        actions_gather_as: list
+    asset:
+        fixed_columns:
+            smartphone_main: 1
+            smartphone_sub: 1
+        per_page_on_footer: 1
+        add_select_all_button: 1
+list_actions_white_list:
+    entry:
+        publish:
+            order: 100
+        set_draft:
+            label: Unpublish
+            order: 200
+        delete:
+            order: 300
+    page:
+        publish:
+            order: 100
+        set_draft:
+            label: Unpublish
+            order: 200
+        delete:
+            order: 300
+    asset:
+        delete: 1
+    blog:
+        # FIXME: How to write empty hash?
+        _dummy: 1
+list_properties:
+    blog:
+        smartphone_main:
+            label: Smartphone Main
+            order: 10100
+            html: |
+                sub {
+                    my $lp = shift;
+                    my $name_lp = MT::ListProperty->instance('blog', 'name');
+                    my $desc_lp = MT::ListProperty->instance('blog', 'description');
+                    my $link = $name_lp->html_link(@_);
+                    my $raw = MT::Util::encode_html($name_lp->raw(@_));
+                    my $desc = MT::Util::encode_html($desc_lp->raw(@_));
+                    qq{<div class="title"><a href="$link" class="edit">$raw</a></div><p class="description">$desc</p>};
+                }
+        smartphone_sub:
+            label: Smartphone Sub
+            order: 10000
+            html: sub { '' }
+    entry:
+        smartphone_main:
+            label: Smartphone Main
+            order: 10100
+            html: |
+                sub {
+                    my $lp = shift;
+                    my $title_lp = MT::ListProperty->instance('entry', 'title');
+                    my $title = $title_lp->html(@_);
+                    my ( $first, $second ) = split( /<p\s/i, $title, 2 );
+                    my $html = qq{<div class="title one-line">$first</div>};
+                    $html .= qq{<div class="excerpt one-line"><p $second</div>} if $second;
+                    $html;
+                }
+        smartphone_sub:
+            label: Smartphone Sub
+            order: 10000
+            html: |
+                sub {
+                    my $lp = shift;
+                    my $authored_on_lp = MT::ListProperty->instance('entry', 'authored_on');
+                    $authored_on_lp->html(@_);
+                }
+    page:
+        smartphone_main:
+            label: Smartphone Main
+            order: 10100
+            html: |
+                sub {
+                    my $lp = shift;
+                    my $title_lp = MT::ListProperty->instance('page', 'title');
+                    my $title = $title_lp->html(@_);
+                    my ( $first, $second ) = split( /<p\s/i, $title, 2 );
+                    my $html = qq{<div class="title one-line">$first</div>};
+                    $html .= qq{<div class="excerpt one-line"><p $second</div>} if $second;
+                    $html;
+                }
+        smartphone_sub:
+            label: Smartphone Sub
+            order: 10000
+            html: |
+                sub {
+                    my $lp = shift;
+                    my $modified_on_lp = MT::ListProperty->instance('page', 'modified_on');
+                    $modified_on_lp->html(@_);
+                }
+    comment:
+        smartphone_main:
+            label: Smartphone Main
+            order: 10100
+            html: |
+                sub {
+                    my $lp = shift;
+
+                    # Comment and status.
+                    my $comment_lp = MT::ListProperty->instance('comment', 'comment');
+                    my $comment = $comment_lp->html(@_);
+                    my $status = '';
+                    if ( $comment =~ s!<span\s[^>]*class="[^"]*status[^"]*"[^>]*>(.+?)</span>!!is ) {
+                        $status = $&;
+                        MT::log($status);
+                    }
+
+                    # Author.
+                    my $author_lp = MT::ListProperty->instance('comment', 'author');
+                    my $author = $author_lp->html(@_);
+                    $author =~ s!</?a[^>]*>!!ig;
+
+                    # Entry or page.
+                    my $entry_lp = MT::ListProperty->instance('comment', 'entry');
+                    my $entry = MT::Util::encode_html($entry_lp->raw(@_));
+
+                    # Format result.
+                    my $html = q{<div class="author one-line">} . $status . $author . q{</div>};
+                    $html .= q{<div class="meta one-line">} . MT->component('smartphoneoption')->translate( 'to [_1]', $entry ) . q{</div>};
+                    $html .= q{<div class="comment one-line">} . $comment . q{</div>};
+                    $html;
+                }
+        smartphone_sub:
+            label: Smartphone Sub
+            order: 10000
+            html: |
+                sub {
+                    my $lp = shift;
+                    my $authored_on_lp = MT::ListProperty->instance('entry', 'created_on');
+                    return $authored_on_lp->html(@_);
+                }
+    asset:
+        smartphone_main:
+            label: Smartphone Main
+            order: 10100
+            bulk_html: |
+                sub {
+                    my $lp = shift;
+                    my $label_lp = MT::ListProperty->instance('asset', 'label');
+                    my @bulk_html = $label_lp->bulk_html(@_);
+                    my @result;
+                    # Exchange title and thumbnial to format.
+                    foreach my $html (@bulk_html) {
+                        if( $html =~ s!<div(.+?)class="(.*?)picture(.+?)</div>!!is ) {
+                            $html = $& . $html;
+                        }
+                        push @result, $html;
+                    }
+                    @result;
+                }
+        smartphone_sub:
+            label: Smartphone Sub
+            order: 10000
+            html: |
+                sub {
+                    my $lp = shift;
+                    my $created_on_lp = MT::ListProperty->instance('asset', 'created_on');
+                    return $created_on_lp->html(@_);
+                }
