@@ -173,15 +173,15 @@ sub _hdlr_gravatar_url {
       my $cache_file_main =  File::Spec->catfile( $local_path, $md5_mail);
       my $cache_dir_url = MT->instance->support_directory_url .'avatar/' ;
       
-      my $ext ='.png'; #ÏÈÉèÖÃºó×ºÎª png,ÒòÎª¼ì²é»úÖÆ²»ÖªµÀÍ¼ÏñÀàÐÍ¡£
+      my $ext ='.png'; #å…ˆè®¾ç½®åŽç¼€ä¸º png,å› ä¸ºæ£€æŸ¥æœºåˆ¶ä¸çŸ¥é“å›¾åƒç±»åž‹ã€‚
       
       require MT::FileMgr;
       my $fmgr     = MT::FileMgr->new('Local'); 
       
-#      unless ( $fmgr->exists($cache_file_main. $ext) )  #Ã»ÓÐ .png
+#      unless ( $fmgr->exists($cache_file_main. $ext) )  #æ²¡æœ‰ .png
 #      { 
-#          $ext = '.gif' ;  #¼ì²é .gif 
-#          unless ( $fmgr->exists($cache_file_main. $ext) ) { $ext = '.jpg' ;}    #Éè¶¨Îª .jpg  
+#          $ext = '.gif' ;  #æ£€æŸ¥ .gif 
+#          unless ( $fmgr->exists($cache_file_main. $ext) ) { $ext = '.jpg' ;}    #è®¾å®šä¸º .jpg  
 #      }
 #      
       my $cache_file = $cache_file_main . $ext ;      
@@ -194,7 +194,7 @@ sub _hdlr_gravatar_url {
             # newer than 7 days ago, don't download the userpic
             return $cache_file_url;
         }
-        $fmgr->delete($cache_file);  #³¬¹ý7ÌìÀ²¡£É¾³ý¡£
+        $fmgr->delete($cache_file);  #è¶…è¿‡7å¤©å•¦ã€‚åˆ é™¤ã€‚
       }
     return &_get_from_gravatar_noassetset( $md5_mail, $local_path,$cache_dir_url);
 
@@ -217,8 +217,8 @@ sub _get_from_gravatar_noassetset {
 #        'image/gif'  => '.gif'
 #    }->{$mimetype};
 #    
-#    unless ($ext) { $ext ='.png'; } #Èç¹ûÃ»ÓÐ»ñÈ¡µ½ mimetype Ç¿ÐÐÉèÖÃÎª png 
-      $ext ='.png';   # Ç¿ÐÐÉèÖÃÎª png 
+#    unless ($ext) { $ext ='.png'; } #å¦‚æžœæ²¡æœ‰èŽ·å–åˆ° mimetype å¼ºè¡Œè®¾ç½®ä¸º png 
+      $ext ='.png';   # å¼ºè¡Œè®¾ç½®ä¸º png 
 
     require MT::FileMgr;
     my $fmgr = MT::FileMgr->new('Local');
