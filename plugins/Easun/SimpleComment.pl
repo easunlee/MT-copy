@@ -218,7 +218,7 @@ sub _get_from_gravatar_noassetset {
 #    }->{$mimetype};
 #    
 #    unless ($ext) { $ext ='.png'; } #如果没有获取到 mimetype 强行设置为 png 
-      $ext ='.png';   # 强行设置为 png 
+      my $ext ='.png';   # 强行设置为 png 
 
     require MT::FileMgr;
     my $fmgr = MT::FileMgr->new('Local');
