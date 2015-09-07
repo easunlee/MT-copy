@@ -1106,7 +1106,8 @@ sub post {
         sub {
             $app->rebuild_entry(
                 Entry             => $entry->id,
-                BuildDependencies => 1
+                # BuildDependencies => 1  #不更新其他了。
+                PreferredArchiveOnly => 1
                 )
                 or return $app->handle_error(
                 $app->translate( "Publishing failed: [_1]", $app->errstr ) );
