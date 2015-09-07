@@ -19,7 +19,7 @@ use vars qw( @ISA %Lexicon );
 
 ## php/mt.php
 	'Page not found - [_1]' => '未找到页面 - [_1]',
-	'Blog Stats' => '网站状态',
+	'Blog Stats' => 'Blog状态',
       'Invalid date \'[_1]\'; dates must be in the format YYYY-MM-DD HH:MM:SS.'  => '不合法的日期格式 \'[_1]\'; 日期格式必须是 YYYY-MM-DD HH:MM:SS 。',
       'Invalid date \'[_1]\'; dates should be real dates.'  => '不合法的日期格式 \'[_1]\'; 请输入一个真实存在的日期。',
       'Invalid date \'[_1]\'; dates should be real dates.'  => '不合法的日期格式 \'[_1]\'; 请输入一个真实存在的日期。',
@@ -436,9 +436,9 @@ use vars qw( @ISA %Lexicon );
 ## default_templates/technorati_search.mtml
 	'Technorati' => 'Techonrati',
 	'<a href=\'http://www.technorati.com/\'>Technorati</a> search' => '<a href=\'http://www.technorati.com/\'>Technorati</a> 搜索',
-	'this blog' => '此网站',
-	'all blogs' => '所有网站',
-	'Blogs that link here' => '链接到这里的网站',
+	'this blog' => '此Blog',
+	'all blogs' => '所有Blog(s)',
+	'Blogs that link here' => '链接到这里的Blog(s)',
 
 ## default_templates/search_results.mtml
 	'Search Results' => '搜索结果',
@@ -542,7 +542,7 @@ use vars qw( @ISA %Lexicon );
 	'Yahoo! JAPAN' => 'Yahoo! JAPAN',
 	'livedoor' => 'livedoor',
 	'Hatena' => 'Hatena',
-	'Movable Type default' => 'Movable Type默认',
+	'Movable Type default' => '系统默认',
 
 ## lib/MT.pm.pre
 
@@ -1254,7 +1254,7 @@ use vars qw( @ISA %Lexicon );
 	'Widget' => '页面组件',
 
 ## lib/MT/Core.pm
-	'Create Blogs' => '新增网站',
+	'Create Blogs' => '新建Blog',
 	'Manage Plugins' => '插件管理',
 	'Manage Templates' => '模板管理',
 	'View System Activity Log' => '查看系统活动日志',
@@ -2433,7 +2433,7 @@ use vars qw( @ISA %Lexicon );
 	'Save Changes' => '保存修改',
 
 ## tmpl/cms/error.tmpl
-	'Close (x)' => '后退(x)',
+	'Close (x)' => '关闭(x)',
 
 ## tmpl/cms/edit_entry.tmpl
 	'Edit Page' => '编辑页面',
@@ -3434,9 +3434,9 @@ use vars qw( @ISA %Lexicon );
 	'spam' => '设为垃圾',
 
 ## tmpl/cms/edit_blog.tmpl
-	'Create Blog' => '新增网站',
-	'Your blog configuration has been saved.' => '网站配置已保存。',
-	'You must set your Blog Name.' => '必须设置网站名。',
+	'Create Blog' => '创建BLOG',
+	'Your blog configuration has been saved.' => 'Blog配置已保存。',
+	'You must set your Blog Name.' => '必须设置Blog名。',
 	'You did not select a timezone.' => '您还未选择时区。',
 	'You must set your Site URL.' => '必须设置网站名。',
 	'Your Site URL is not valid.' => '无效的站点网址。',
@@ -3444,7 +3444,7 @@ use vars qw( @ISA %Lexicon );
 	'You can not have spaces in your Local Site Path.' => '本地站点路径中不能有空格。',
 	'Your Local Site Path is not valid.' => '无效的本地站点路径。',
 	'Blog Details' => 'Blog详细信息',
-	'Name your blog. The blog name can be changed at any time.' => '命名您的网站。您可以在任何时间更改Blo名。',
+	'Name your blog. The blog name can be changed at any time.' => '命名您的Blog。您可以在任何时间更改Blo名。',
 	'Enter the URL of your public website. Do not include a filename (i.e. exclude index.html). Example: http://www.example.com/weblog/' => '输入您网站使用的URL，请不要包含文件名(如不包含index.html)。例如：http://www.example.com/weblog/ ',
 	'Enter the path where your main index file will be located. An absolute path (starting with \'/\') is preferred, but you can also use a path relative to the Movable Type directory. Example: /home/melody/public_html/weblog' => '输入您网站上主索引文件出版的存放路径。建议使用绝对路径(以/开始)，不过您还是可以使用相对于 Movalbe Type 的相对路径。例如：/home/melody/public_html/weblog',
 	'Blog language.' => 'Blog语言',
@@ -4098,7 +4098,7 @@ use vars qw( @ISA %Lexicon );
 	'Selected template(s) has been copied.' => '选中的模板已复制。',
 
 ## tmpl/cms/cfg_system_general.tmpl
-	'System: General Settings' => '系统：一般设置',
+	'System: General Settings' => '系统：基本设置',
 	'System Email' => '系统Email',
 	'The email address used in the From: header of each email sent from the system.  The address is used in password recovery, commenter registration, comment, trackback notification, entry notification and a few other minor events.' => '表单中使用的Email地址: 从系统发出的每封邮件的头。此Email地址用于找回您的密码，评论注册，评论、引用通告的通知，文章通知和其它各项主要事件发送通知用。',
 
