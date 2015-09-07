@@ -170,13 +170,12 @@ sub _hdlr_gravatar_url {
       
       my $local_path = File::Spec->catdir( MT->instance->support_directory_path, 'avatar' );
       $local_path =~ s|/$||  unless $local_path eq  '/';  ## OS X doesn't like / at the end in mkdir().
-      my $ext ='';
+      my $ext ='.png'; #强行设置后缀为 png ，因为检查机制不知道图像类型。
       my $cache_file =  File::Spec->catfile( $local_path, $md5_mail . $ext );
-      my $cache_file_url= MT->instance->support_directory_url .'/avatar/' . $md5_mail . $ext ;
+      my $cache_file_url= MT->instance->support_directory_url .'avatar/' . $md5_mail . $ext ;
       
       require MT::FileMgr;
-      my $fmgr     = MT::FileMgr->new('Local');
-      
+      my $fmgr     = MT::FileMgr->new('Local');      
       if ( $fmgr->exists($cache_file) ) {                
         my $mtime    = $fmgr->file_mod_time( $cache_file );
         my $INTERVAL = 60 * 60 * 24 * 7;
@@ -184,16 +183,14 @@ sub _hdlr_gravatar_url {
             # newer than 7 days ago, don't download the userpic
             return $cache_file_url;
         }
-        $fmgr->delete($cache_file); 
+        $fmgr->delete($cache_file);  #超过7天啦。删除。
       }
-    # my $gravatar_url = "http://cn.gravatar.com/avatar/" . $md5_mail . '?s=50&d=identicon' ;
-    return &_get_from_gravatar_noassetset( $md5_mail, $local_path );
-    #return $gravatar_url ;
-    # return $url;
+    return &_get_from_gravatar_noassetset( $md5_mail, $local_path,$cache_file_url);
+
 }
 
 sub _get_from_gravatar_noassetset { 
-    my ($md5,$local_path) = @_;
+    my ($md5,$local_path,$cache_file_url) = @_;
     my $image_url = "http://cn.gravatar.com/avatar/" . $md5 . '?s=50&d=identicon' ;
     my $ua = MT->new_ua( { paranoid => 1 } )  or return;
     my $resp = $ua->get($image_url);
@@ -209,7 +206,7 @@ sub _get_from_gravatar_noassetset {
         'image/gif'  => '.gif'
     }->{$mimetype};
     
-    $ext ='';
+    $ext ='.png'; #强行设置后缀为 png
 
     require MT::FileMgr;
     my $fmgr = MT::FileMgr->new('Local');
@@ -218,7 +215,7 @@ sub _get_from_gravatar_noassetset {
     my $filename = $md5;
     my $local_img   = File::Spec->catfile( $local_path, $filename . $ext );
     $fmgr->put_data( $image, $local_img, 'upload' );
-    return $image_url ;
+    return $cache_file_url ;
 }
 
 1;
