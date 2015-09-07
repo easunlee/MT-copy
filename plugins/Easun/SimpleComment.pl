@@ -178,12 +178,12 @@ sub _hdlr_gravatar_url {
       require MT::FileMgr;
       my $fmgr     = MT::FileMgr->new('Local'); 
       
-      unless ( $fmgr->exists($cache_file_main. $ext) )  #没有 .png
-      { 
-          $ext = '.gif' ;  #检查 .gif 
-          unless ( $fmgr->exists($cache_file_main. $ext) ) { $ext = '.jpg' ;}    #设定为 .jpg  
-      }
-      
+#      unless ( $fmgr->exists($cache_file_main. $ext) )  #没有 .png
+#      { 
+#          $ext = '.gif' ;  #检查 .gif 
+#          unless ( $fmgr->exists($cache_file_main. $ext) ) { $ext = '.jpg' ;}    #设定为 .jpg  
+#      }
+#      
       my $cache_file = $cache_file_main . $ext ;      
       my $cache_file_url= $cache_dir_url . $md5_mail . $ext ; 
       
@@ -211,13 +211,14 @@ sub _get_from_gravatar_noassetset {
     return $image_url unless $image;
     my $mimetype = $resp->header('Content-Type');
     return $image_url unless $mimetype;
-    my $ext = {
-        'image/jpeg' => '.jpg',
-        'image/png'  => '.png',
-        'image/gif'  => '.gif'
-    }->{$mimetype};
-    
-    unless ($ext) { $ext ='.png'; } #如果没有获取到 mimetype 强行设置为 png 
+#    my $ext = {
+#        'image/jpeg' => '.jpg',
+#        'image/png'  => '.png',
+#        'image/gif'  => '.gif'
+#    }->{$mimetype};
+#    
+#    unless ($ext) { $ext ='.png'; } #如果没有获取到 mimetype 强行设置为 png 
+      $ext ='.png';   # 强行设置为 png 
 
     require MT::FileMgr;
     my $fmgr = MT::FileMgr->new('Local');
