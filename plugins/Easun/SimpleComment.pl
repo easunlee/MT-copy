@@ -170,12 +170,23 @@ sub _hdlr_gravatar_url {
       
       my $local_path = File::Spec->catdir( MT->instance->support_directory_path, 'avatar' );
       $local_path =~ s|/$||  unless $local_path eq  '/';  ## OS X doesn't like / at the end in mkdir().
-      my $ext ='.png'; #强行设置后缀为 png ，因为检查机制不知道图像类型。
-      my $cache_file =  File::Spec->catfile( $local_path, $md5_mail . $ext );
-      my $cache_file_url= MT->instance->support_directory_url .'avatar/' . $md5_mail . $ext ;
+      my $cache_file_main =  File::Spec->catfile( $local_path, $md5_mail);
+      my $cache_dir_url = MT->instance->support_directory_url .'avatar/' ;
+      
+      my $ext ='.png'; #先设置后缀为 png,因为检查机制不知道图像类型。
       
       require MT::FileMgr;
-      my $fmgr     = MT::FileMgr->new('Local');      
+      my $fmgr     = MT::FileMgr->new('Local'); 
+      
+      unless ( $fmgr->exists($cache_file_main. $ext) )  #没有 .png
+      { 
+          $ext = '.gif' ;  #检查 .gif 
+          unless ( $fmgr->exists($cache_file_main. $ext) ) { $ext = '.jpg' ;}    #设定为 .jpg  
+      }
+      
+      my $cache_file = $cache_file_main . $ext ;      
+      my $cache_file_url= $cache_dir_url . $md5_mail . $ext ; 
+      
       if ( $fmgr->exists($cache_file) ) {                
         my $mtime    = $fmgr->file_mod_time( $cache_file );
         my $INTERVAL = 60 * 60 * 24 * 7;
@@ -185,12 +196,12 @@ sub _hdlr_gravatar_url {
         }
         $fmgr->delete($cache_file);  #超过7天啦。删除。
       }
-    return &_get_from_gravatar_noassetset( $md5_mail, $local_path,$cache_file_url);
+    return &_get_from_gravatar_noassetset( $md5_mail, $local_path,$cache_dir_url);
 
 }
 
 sub _get_from_gravatar_noassetset { 
-    my ($md5,$local_path,$cache_file_url) = @_;
+    my ($md5,$local_path,$cache_dir_url) = @_;
     my $image_url = "http://cn.gravatar.com/avatar/" . $md5 . '?s=50&d=identicon' ;
     my $ua = MT->new_ua( { paranoid => 1 } )  or return;
     my $resp = $ua->get($image_url);
@@ -206,16 +217,15 @@ sub _get_from_gravatar_noassetset {
         'image/gif'  => '.gif'
     }->{$mimetype};
     
-    $ext ='.png'; #强行设置后缀为 png
+    unless ($ext) { $ext ='.png'; } #如果没有获取到 mimetype 强行设置为 png 
 
     require MT::FileMgr;
     my $fmgr = MT::FileMgr->new('Local');
     
     unless ( $fmgr->exists($local_path) ) { $fmgr->mkpath($local_path); }
-    my $filename = $md5;
-    my $local_img   = File::Spec->catfile( $local_path, $filename . $ext );
+    my $local_img   = File::Spec->catfile( $local_path, $md5 . $ext );
     $fmgr->put_data( $image, $local_img, 'upload' );
-    return $cache_file_url ;
+    return $cache_dir_url . $md5 . $ext  ;
 }
 
 1;
