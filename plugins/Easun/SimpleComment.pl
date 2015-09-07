@@ -159,25 +159,71 @@ sub _hdlr_gravatar_url {
              
        #Easun 's QQ plugin    ($cmntr->auth_type =~ m/^QQ/ )  
        my $cmntr = $ctx->stash('commenter');
-       if ($cmntr && $cmntr->hint && ($cmntr->hint=~ m!^https?://!) )  {  return $cmntr->hint; }
+       if ($cmntr && $cmntr->hint && ($cmntr->hint=~ m!^https?://!) )  { return $cmntr->hint; }
        
-       if ($cmntr && $cmntr->url && ($cmntr->url =~ m/^QQ\|/ ) )  { 
-           my $qqavatar = $cmntr->url;
-           $qqavatar =~ s{^QQ\|}{}i;
-           return $qqavatar ; 
-       }   
+       
+       # Easun 's QQ plugin || 旧的方式，占用 $cmntr->url 
+#       if ($cmntr && $cmntr->url && ($cmntr->url =~ m/^QQ\|/ ) )  { 
+#           my $qqavatar = $cmntr->url;
+#           $qqavatar =~ s{^QQ\|}{}i;
+#           return $qqavatar ; 
+#       }   
          
        # gravatar_url         
        my $email = $c->email;
-       return  'http://static.easunlee.cn/images/ds-avatar.png' if ($email eq '');
+       return  'http://static.easunlee.cn/images/ds-avatar.png' if ($email eq '');       
               
       require Digest::MD5;
-             $url = "http://cn.gravatar.com/avatar/".Digest::MD5::md5_hex(lc($email)).'?s=50&d=identicon';
-            #$url .= exists $args->{size} ? "&amp;s=".$args->{size} : "";
-            #$url .= exists $args->{rating} ? "&amp;r=".$args->{rating} : "";
-            #$url .= exists $args->{default} ? "&amp;d=".uri_escape($args->{default}) : "";
-            #$url .= exists $args->{border} ? "&amp;b=".$args->{border} : "";
-        return $url;
+      my $md5_mail = Digest::MD5::md5_hex(lc($email)); 
+      
+      my $local_path = File::Spec->catdir( MT->instance->support_directory_path, 'avatar' );
+      $local_path =~ s|/$||  unless $local_path eq  '/';  ## OS X doesn't like / at the end in mkdir().
+      my $ext ='';
+      my $cache_file =  File::Spec->catfile( $local_path, $md5 . $ext );
+      my $cache_file_url= MT->instance->support_directory_url .'/avatar/' . $md5 . $ext;
+      require MT::FileMgr;
+      my $fmgr     = MT::FileMgr->new('Local');
+      if ( $fmgr->exists($cache_file) ) {                
+        my $mtime    = $fmgr->file_mod_time( $cache_file );
+        my $INTERVAL = 60 * 60 * 24 * 7;
+        if ( $mtime > time - $INTERVAL ) {
+            # newer than 7 days ago, don't download the userpic
+            return $cache_file_url;
+        }
+        else { $fmgr->delete($cache_file); }        
+    }
+    my $gravatar_url = 'http://cn.gravatar.com/avatar/' .$md5. '?s=50&d=identicon';
+    if ( &_get_pic_from_gravatar_noassetset($gravatar_url,$md5,$local_path) > 0)  return $cache_file_url;
+    else return $gravatar_url ;
+    # return $url;
+}
+
+
+sub _get_pic_from_gravatar_noassetset { 
+    my ($image_url, $md5,$local_path) = @_;
+    my $ua = MT->new_ua( { paranoid => 1 } )  or return;
+    my $resp = $ua->get($image_url);
+    return undef unless $resp->is_success;
+    return undef if $resp->code eq '404';
+    my $image = $resp->content;
+    return undef unless $image;
+    my $mimetype = $resp->header('Content-Type');
+    return undef unless $mimetype;
+    my $ext = {
+        'image/jpeg' => '.jpg',
+        'image/png'  => '.png',
+        'image/gif'  => '.gif'
+    }->{$mimetype};
+    
+    $ext ='';
+
+    require MT::FileMgr;
+    my $fmgr = MT::FileMgr->new('Local');
+    
+    unless ( $fmgr->exists($local_path) ) { $fmgr->mkpath($local_path); }
+    my $filename = $md5;
+    my $local_img   = File::Spec->catfile( $local_path, $filename . $ext );
+    return $fmgr->put_data( $image, $local_img, 'upload' );
 }
 
 1;
