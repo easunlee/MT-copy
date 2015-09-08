@@ -229,4 +229,15 @@ sub _get_from_gravatar_noassetset {
     return $cache_dir_url . $md5 . $ext  ;
 }
 
+
+our($old);
+{
+    no warnings 'redefine';
+    no strict 'refs';
+    require MT::Author;
+    if ($old = MT::Author->can('userpic_url')) {        
+        *MT::Author::userpic_url = sub{ my ($oldurl) = $old->(@_); return &_hdlr_gravatar_url($oldurl); };     
+    }    
+}
+
 1;
