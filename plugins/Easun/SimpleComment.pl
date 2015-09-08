@@ -163,7 +163,7 @@ sub _hdlr_gravatar_url {
          
        # gravatar_url         
        my $email = $c->email;
-       return  'http://static.easunlee.cn/images/ds-avatar.png' if ($email eq '');       
+       return  'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=' if ($email eq '');       
               
       require Digest::MD5;
       my $md5_mail = Digest::MD5::md5_hex(lc($email)) ;
