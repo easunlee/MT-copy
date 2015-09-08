@@ -151,19 +151,22 @@ sub _hdlr_easun_html_reduce {
 
 ## CommenterUserpicURL
 sub _hdlr_gravatar_url {
-        my ($url, $param, $ctx) = @_;  
-        return $url if ($url ne '') ;   
-           
+	  my ($url, $param, $ctx) = @_;  
+        return $url if ($url ne '') ;              
         my $c = $ctx->stash('comment')
-            or return $ctx->_no_comment_error();  
-             
+            or return $ctx->_no_comment_error();               
        #Easun 's QQ plugin    ($cmntr->auth_type =~ m/^QQ/ )  
        my $cmntr = $ctx->stash('commenter');
        if ($cmntr && $cmntr->hint && ($cmntr->hint=~ m!^https?://!) )  { return $cmntr->hint; }
-         
        # gravatar_url         
        my $email = $c->email;
-       return  'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=' if ($email eq '');       
+       return  'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=' if ($email eq '');
+       return &_hdlr_gravatar_url_mail($email);
+}
+
+sub _hdlr_gravatar_url_mail {
+        my ($email) = @_;  
+       return  'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=' if ($email eq '');      
               
       require Digest::MD5;
       my $md5_mail = Digest::MD5::md5_hex(lc($email)) ;
@@ -236,7 +239,12 @@ our($old);
     no strict 'refs';
     require MT::Author;
     if ($old = MT::Author->can('userpic_url')) {        
-        *MT::Author::userpic_url = sub{ my ($oldurl) = $old->(@_); return &_hdlr_gravatar_url($oldurl); };     
+        *MT::Author::userpic_url = sub{ 
+             my ($oldurl) = $old->(@_); 
+             return $oldurl if ($oldurl);  
+             my ($author)  = @_;  my $email = $author->email;
+             return &_hdlr_gravatar_url_mail($email); 
+             };
     }    
 }
 
