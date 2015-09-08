@@ -1773,7 +1773,7 @@ BEGIN {
                 { default => 'https://www.typekey.com/t/typekey/login?', },
             'SignOffURL' =>
                 { default => 'https://www.typekey.com/t/typekey/logout?', },
-            'IdentityURL' => { default => "http://profile.typekey.com/", },
+            'IdentityURL' => { default => "http://profile.typepad.com/", },
             'DynamicComments'           => { default => 0, },
             'SignOnPublicKey'           => { default => '', },
             'ThrottleSeconds'           => { default => 20, },
