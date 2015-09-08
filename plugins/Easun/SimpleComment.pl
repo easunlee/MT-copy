@@ -240,9 +240,11 @@ our($old);
     require MT::Author;
     if ($old = MT::Author->can('userpic_url')) {        
         *MT::Author::userpic_url = sub{ 
+             my ($author)  = @_; 
+             if (  ($author->auth_type =~ m/^QQ/ ) && $author->hint && ($author->hint=~ m!^https?://!) ) { return $author->hint. '#QQ' ;}
              my ($oldurl) = $old->(@_); 
              return $oldurl if ($oldurl);  
-             my ($author)  = @_;  my $email = $author->email;
+              my $email = $author->email;
              return &_hdlr_gravatar_url_mail($email); 
              };
     }    
