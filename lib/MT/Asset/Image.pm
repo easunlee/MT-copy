@@ -384,10 +384,11 @@ sub as_html {
             }
             else {
                 $text = sprintf(
-                    '<img alt="%s" src="%s" %s %s />',
+                    '<figure class="post-image"><img title="%s" src="%s" %s %s /></figure>',
                     MT::Util::encode_html( $asset->label ),
                     MT::Util::encode_html( $asset->url ),
-                    $dimensions, $wrap_style,
+                    undef,undef,
+                    #$dimensions, $wrap_style,
                 );
             }
         }
