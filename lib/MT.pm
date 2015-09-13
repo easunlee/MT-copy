@@ -45,19 +45,19 @@ BEGIN {
 
   # To allow MT to run straight from svn, if no build process (pre-processing)
   # is run, then default to MTOS
-    if ( $PRODUCT_NAME eq '__PRODUCT' . '_NAME__' ) {
-        $PRODUCT_NAME = 'Movable Type';
-    }
-    if ( $PORTAL_URL eq '__PORTAL' . '_URL__' ) {
-        $PORTAL_URL = 'http://www.movabletype.org/';
-    }
-    if ( $VERSION_ID eq '__PRODUCT_VERSION' . '_ID__' ) {
-        $VERSION_ID = $PRODUCT_VERSION;
-    }
-
-    if ( $RELEASE_NUMBER eq '__RELEASE' . '_NUMBER__' ) {
-        $RELEASE_NUMBER = 13;
-    }
+#    if ( $PRODUCT_NAME eq '__PRODUCT' . '_NAME__' ) {
+#        $PRODUCT_NAME = 'Movable Type';
+#    }
+#    if ( $PORTAL_URL eq '__PORTAL' . '_URL__' ) {
+#        $PORTAL_URL = 'http://www.movabletype.org/';
+#    }
+#    if ( $VERSION_ID eq '__PRODUCT_VERSION' . '_ID__' ) {
+#        $VERSION_ID = $PRODUCT_VERSION;
+#    }
+#
+#    if ( $RELEASE_NUMBER eq '__RELEASE' . '_NUMBER__' ) {
+#        $RELEASE_NUMBER = 13;
+#    }
 
     $DebugMode = 0;
 
@@ -1101,11 +1101,29 @@ sub bootstrap {
     $pkg->init_paths() or return;
     $pkg->init_core()  or return;
 }
-
+sub set_cpanel_lib
+{
+    my $mt = shift;
+    my $g_path = '/MYPATH/TO/SITE/';
+    my @mylib = (
+	 $g_path.'web_data/lib',
+         $g_path.'web_data/extlib',
+         $g_path.'perl5/lib/perl5',
+ 	 $g_path.'perl5/lib/perl5/x86_64-linux-thread-multi',
+	 $g_path.'perl/usr/local/lib64/perl5',
+	 $g_path.'perl/usr/local/share/perl5',
+	 $g_path.'perl/usr/lib64/perl5/vendor_perl',
+	 $g_path.'perl/usr/share/perl5/vendor_perl',
+	 $g_path.'perl/usr/lib64/perl5', 
+	 $g_path.'perl/usr/share/perl5', 
+    );
+     push @INC, @mylib;
+}
 sub init_paths {
     my $mt = shift;
     my ($param) = @_;
-
+    
+    $mt->set_cpanel_lib();
     # determine MT directory
     my ($orig_dir);
     require File::Spec;
