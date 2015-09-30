@@ -191,6 +191,8 @@ sub Markdown {
     $text = _RunBlockGamut($text);
 
     $text = _UnescapeSpecialChars($text);
+    $text = _easunCode($text);
+
 
     return $text . "\n" if $text;
 }
@@ -383,6 +385,13 @@ sub _RunBlockGamut {
 
     $text = _FormParagraphs($text);
 
+    return $text;
+}
+
+sub _easunCode {
+    my $text = shift;
+    $text =~ s/<pre><code>\`\`\`(.*)$/<pre><code class=\"language-$1\">/g;
+    $text =~ s/<pre><code>/<pre><code class=\"language-perl\">/g;
     return $text;
 }
 
