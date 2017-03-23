@@ -1101,29 +1101,11 @@ sub bootstrap {
     $pkg->init_paths() or return;
     $pkg->init_core()  or return;
 }
-sub set_cpanel_lib
-{
-    my $mt = shift;
-    my $g_path = '/MYPATH/TO/SITE/';
-    my @mylib = (
-	 $g_path.'web_data/lib',
-         $g_path.'web_data/extlib',
-         $g_path.'perl5/lib/perl5',
- 	 $g_path.'perl5/lib/perl5/x86_64-linux-thread-multi',
-	 $g_path.'perl/usr/local/lib64/perl5',
-	 $g_path.'perl/usr/local/share/perl5',
-	 $g_path.'perl/usr/lib64/perl5/vendor_perl',
-	 $g_path.'perl/usr/share/perl5/vendor_perl',
-	 $g_path.'perl/usr/lib64/perl5', 
-	 $g_path.'perl/usr/share/perl5', 
-    );
-     push @INC, @mylib;
-}
+
 sub init_paths {
     my $mt = shift;
-    my ($param) = @_;
-    
-    $mt->set_cpanel_lib();
+    my ($param) = @_;   
+
     # determine MT directory
     my ($orig_dir);
     require File::Spec;
