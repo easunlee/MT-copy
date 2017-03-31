@@ -242,6 +242,7 @@ our($old);
         *MT::Author::userpic_url = sub{ 
              my ($author)  = @_; 
              if (  ($author->auth_type =~ m/^QQ/ ) && $author->hint && ($author->hint=~ m!^https?://!) ) { return $author->hint. '#QQ' ;}
+             if (  ($author->auth_type =~ m/^GitHub/ ) && $author->hint && ($author->hint=~ m!^https?://!) ) { return $author->hint. '#GitHub' ;}
              my ($oldurl) = $old->(@_); 
              return $oldurl if ($oldurl);  
               my $email = $author->email;
