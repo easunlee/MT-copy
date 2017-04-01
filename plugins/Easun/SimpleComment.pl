@@ -205,7 +205,8 @@ sub _hdlr_gravatar_url_mail {
 
 sub _get_from_gravatar_noassetset { 
     my ($md5,$local_path,$cache_dir_url) = @_;
-    my $image_url = "http://cn.gravatar.com/avatar/" . $md5 . '?s=50&d=identicon' ;
+#    my $image_url = "http://cn.gravatar.com/avatar/" . $md5 . '?s=50&d=identicon' ;
+    my $image_url = "http://cn.gravatar.com/avatar/" . $md5 . '?s=50&d=404' ;
     my $ua = MT->new_ua( { paranoid => 1 } )  or return;
     my $resp = $ua->get($image_url);
     return $image_url unless $resp->is_success;
