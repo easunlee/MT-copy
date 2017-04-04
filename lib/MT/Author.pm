@@ -1464,7 +1464,7 @@ sub userpic_url {
     my (%param) = @_;
     
     # QQ pic
-    if (  ($author->auth_type =~ m/^QQ/ ) && $author->hint && ($author->hint=~ m!^https?://!) ) { return $author->hint. '#QQ' ;}
+    # if (  ($author->auth_type =~ m/^QQ/ ) && $author->hint && ($author->hint=~ m!^https?://!) ) { return $author->hint. '#QQ' ;}
     # QQ pic
     
     my $asset = delete $param{Asset};

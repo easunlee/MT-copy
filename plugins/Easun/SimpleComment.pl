@@ -154,7 +154,8 @@ sub _hdlr_easun_html_reduce {
 ## CommenterUserpicURL
 sub _hdlr_gravatar_url {
 	  my ($url, $param, $ctx) = @_;  
-        return $url if ($url ne '') ;     ## has Userpic,  return;     
+        return $url if ($url ne '') ;     ## has Userpic,  return;  
+           
         my $c = $ctx->stash('comment')
             or return $ctx->_no_comment_error();               
        #Easun 's QQ|GitHub  plugin  ( ($cmntr->auth_type =~ m/^QQ/ ) ||  ($cmntr->auth_type =~ m/^GitHub/ ) )
@@ -254,7 +255,7 @@ our($old);
         *MT::Author::userpic_url = sub{ 
             my ($oldurl) = $old->(@_); 
             my ($author)  = @_; 
-            return $oldurl."#".$author->auth_type  if ($oldurl);  
+            return $oldurl ."#".$author->auth_type  if ($oldurl);  
              
              if (  ($author->auth_type =~ m/^QQ/ ) && $author->hint && ($author->hint=~ m!^https?://!) ) { return $author->hint. '#QQ' ;}
              if (  ($author->auth_type =~ m/^GitHub/ ) && $author->hint && ($author->hint=~ m!^https?://!) ) { return $author->hint. '#GitHub' ;}
