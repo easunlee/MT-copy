@@ -54,9 +54,7 @@ $DEBUG = 0;
 
 #}
 
-    my $no_img=   'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';      
-
-
+    my $no_img=   'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';     
 
 MT::Template::Context->add_tag(SimpleCommentJS =>  \&_mt_tag_SimpleCommentJS );
 MT::Template::Context->add_tag(SimpleCommentinFormKey =>  \&_mt_tag_SimpleCommentinFormKey );
@@ -159,9 +157,16 @@ sub _hdlr_gravatar_url {
         return $url if ($url ne '') ;              
         my $c = $ctx->stash('comment')
             or return $ctx->_no_comment_error();               
-       #Easun 's QQ plugin    ($cmntr->auth_type =~ m/^QQ/ )  
+       #Easun 's QQ plugin    ( ($cmntr->auth_type =~ m/^QQ/ ) ||  ($cmntr->auth_type =~ m/^GitHub/ ) )
        my $cmntr = $ctx->stash('commenter');
-       if ($cmntr && $cmntr->hint && ($cmntr->hint=~ m!^https?://!) )  { return $cmntr->hint; }
+       if ($cmntr 
+        && ( ($cmntr->auth_type =~ m/^QQ/ ) ||  ($cmntr->auth_type =~ m/^GitHub/ ) )
+        && $cmntr->hint 
+        && ($cmntr->hint=~ m!^https?://!)
+         )  
+         {
+          return $cmntr->hint; 
+          }
        # gravatar_url         
        my $email = $c->email;
        return $no_img if ($email eq '');
