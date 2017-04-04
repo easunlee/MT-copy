@@ -54,6 +54,10 @@ $DEBUG = 0;
 
 #}
 
+    my $no_img=   'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';      
+
+
+
 MT::Template::Context->add_tag(SimpleCommentJS =>  \&_mt_tag_SimpleCommentJS );
 MT::Template::Context->add_tag(SimpleCommentinFormKey =>  \&_mt_tag_SimpleCommentinFormKey );
 MT::Template::Context->add_tag(SimpleCommentQueryString =>  \&_mt_tag_SimpleCommentQueryString );
@@ -160,13 +164,13 @@ sub _hdlr_gravatar_url {
        if ($cmntr && $cmntr->hint && ($cmntr->hint=~ m!^https?://!) )  { return $cmntr->hint; }
        # gravatar_url         
        my $email = $c->email;
-       return  'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=' if ($email eq '');
+       return $no_img if ($email eq '');
        return &_hdlr_gravatar_url_mail($email);
 }
 
 sub _hdlr_gravatar_url_mail {
         my ($email) = @_;  
-       return  'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=' if ($email eq '');      
+       return  $no_img if ($email eq '');      
               
       require Digest::MD5;
       my $md5_mail = Digest::MD5::md5_hex(lc($email)) ;
@@ -199,8 +203,8 @@ sub _hdlr_gravatar_url_mail {
         }
         $fmgr->delete($cache_file);  #超过7天啦。删除。
       }
-    return &_get_from_gravatar_noassetset( $md5_mail, $local_path,$cache_dir_url);
-
+    my $locimg = &_get_from_gravatar_noassetset( $md5_mail, $local_path,$cache_dir_url);
+    return $locimg ? $locimg : $no_img;
 }
 
 sub _get_from_gravatar_noassetset { 
@@ -209,14 +213,13 @@ sub _get_from_gravatar_noassetset {
     my $image_url = "http://cn.gravatar.com/avatar/" . $md5 . '?s=50&d=404' ;
     my $ua = MT->new_ua( { paranoid => 1 } )  or return;
     my $resp = $ua->get($image_url);
-    my $badimg=   'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';      
-    return $badimg unless $resp->is_success;
-    return $badimg if $resp->code eq '404';
+    return undef unless $resp->is_success;
+    return undef if $resp->code eq '404';
     
     my $image = $resp->content;
-    return $badimg unless $image;
+    return undef unless $image;
     my $mimetype = $resp->header('Content-Type');
-    return $badimg unless $mimetype;
+    return undef unless $mimetype;
 #    my $ext = {
 #        'image/jpeg' => '.jpg',
 #        'image/png'  => '.png',
