@@ -154,19 +154,20 @@ sub _hdlr_easun_html_reduce {
 ## CommenterUserpicURL
 sub _hdlr_gravatar_url {
 	  my ($url, $param, $ctx) = @_;  
-        return $url if ($url ne '') ;              
+        return $url if ($url ne '') ;     ## has Userpic,  return;     
         my $c = $ctx->stash('comment')
             or return $ctx->_no_comment_error();               
-       #Easun 's QQ plugin    ( ($cmntr->auth_type =~ m/^QQ/ ) ||  ($cmntr->auth_type =~ m/^GitHub/ ) )
+       #Easun 's QQ|GitHub  plugin  ( ($cmntr->auth_type =~ m/^QQ/ ) ||  ($cmntr->auth_type =~ m/^GitHub/ ) )
        my $cmntr = $ctx->stash('commenter');
        if ($cmntr 
-        && ( ($cmntr->auth_type =~ m/^QQ/ ) ||  ($cmntr->auth_type =~ m/^GitHub/ ) )
-        && $cmntr->hint 
-        && ($cmntr->hint=~ m!^https?://!)
+            && ( ($cmntr->auth_type =~ m/^QQ/ ) ||  ($cmntr->auth_type =~ m/^GitHub/ ) )
+            && $cmntr->hint 
+            && ($cmntr->hint=~ m!^https?://!)
          )  
          {
-          return $cmntr->hint; 
+             return $cmntr->hint ."#".$cmntr->auth_type ; 
           }
+          
        # gravatar_url         
        my $email = $c->email;
        return $no_img if ($email eq '');
@@ -251,12 +252,13 @@ our($old);
     require MT::Author;
     if ($old = MT::Author->can('userpic_url')) {        
         *MT::Author::userpic_url = sub{ 
-             my ($author)  = @_; 
+            my ($oldurl) = $old->(@_); 
+            my ($author)  = @_; 
+            return $oldurl."#".$author->auth_type  if ($oldurl);  
+             
              if (  ($author->auth_type =~ m/^QQ/ ) && $author->hint && ($author->hint=~ m!^https?://!) ) { return $author->hint. '#QQ' ;}
              if (  ($author->auth_type =~ m/^GitHub/ ) && $author->hint && ($author->hint=~ m!^https?://!) ) { return $author->hint. '#GitHub' ;}
-             my ($oldurl) = $old->(@_); 
-             return $oldurl if ($oldurl);  
-              my $email = $author->email;
+             my $email = $author->email;
              return &_hdlr_gravatar_url_mail($email); 
              };
     }    
