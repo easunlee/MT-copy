@@ -209,12 +209,14 @@ sub _get_from_gravatar_noassetset {
     my $image_url = "http://cn.gravatar.com/avatar/" . $md5 . '?s=50&d=404' ;
     my $ua = MT->new_ua( { paranoid => 1 } )  or return;
     my $resp = $ua->get($image_url);
-    return $image_url unless $resp->is_success;
-    return $image_url if $resp->code eq '404';
+    my $badimg=   'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';      
+    return $badimg unless $resp->is_success;
+    return $badimg if $resp->code eq '404';
+    
     my $image = $resp->content;
-    return $image_url unless $image;
+    return $badimg unless $image;
     my $mimetype = $resp->header('Content-Type');
-    return $image_url unless $mimetype;
+    return $badimg unless $mimetype;
 #    my $ext = {
 #        'image/jpeg' => '.jpg',
 #        'image/png'  => '.png',

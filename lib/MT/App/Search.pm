@@ -630,7 +630,8 @@ sub _log_search {
         require MT::Log;
         $app->log(
             {   message => $app->translate(
-                    "Search: query for '[_1]'",
+                    "[_1] Search: query for '[_2]'",
+                    $app->mode,
                     $app->{search_string}
                 ),
                 level    => MT::Log::INFO(),

@@ -119,7 +119,7 @@ sub version_slug {
     return MT->translate_templatized(<<"SLUG");
 <__trans phrase="Powered by [_1]" params="$PRODUCT_NAME">
 <__trans phrase="Version [_1]" params="$VERSION_ID">
-<__trans phrase="http://www.movabletype.com/">
+<__trans phrase="http://www.movabletype.org/">
 SLUG
 }
 

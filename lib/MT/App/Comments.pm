@@ -1080,16 +1080,15 @@ sub post {
         }
     }
 
-# ---By EasunLee 2015-8-31 ---
-#    if ( $comment->visible ) {
-#        $app->publisher->start_time(time);
-#
-#        # Rebuild the entry synchronously so that if the user gets
-#        # redirected to the indiv. page it will be up-to-date.
-#        $app->rebuild_entry( Entry => $entry->id, PreferredArchiveOnly => 1 )
-#            or return $app->handle_error(
-#            $app->translate( "Publishing failed: [_1]", $app->errstr ) );
-#    }
+     if ( $comment->visible ) {
+         $app->publisher->start_time(time);
+ 
+        # Rebuild the entry synchronously so that if the user gets
+        # redirected to the indiv. page it will be up-to-date.
+        $app->rebuild_entry( Entry => $entry->id, PreferredArchiveOnly => 1 )
+            or return $app->handle_error(
+            $app->translate( "Publishing failed: [_1]", $app->errstr ) );
+    }
 
     if ( $comment->is_junk ) {
         $app->run_tasks('JunkExpiration');
@@ -1106,8 +1105,8 @@ sub post {
         sub {
             $app->rebuild_entry(
                 Entry             => $entry->id,
-                # BuildDependencies => 1  #²»¸üĞÂÆäËûÁË¡£
-                PreferredArchiveOnly => 1
+                 BuildDependencies => 1  #ä¸æ›´æ–°å…¶ä»–äº†ã€‚
+                # PreferredArchiveOnly => 1
                 )
                 or return $app->handle_error(
                 $app->translate( "Publishing failed: [_1]", $app->errstr ) );
@@ -1217,7 +1216,13 @@ sub eval_comment {
             # We don't have a commenter object, but the user wasn't booted
             # so unless moderation is on, we can publish the comment.
             if ( $blog->publish_unauthd_commenters ) {
-                $comment->approve;
+            	   ### by EasunLee 2017
+            	  if(      $comment->email  
+            	      && is_valid_email( $comment->email)  
+            	      && is_gravatar_ok( $comment->email)              	      
+            	       )
+            	  {$comment->approve;}
+            	  else { $comment->moderate;} 
             }
             else {
                 $comment->moderate;
@@ -1229,6 +1234,26 @@ sub eval_comment {
 
     $comment;
 }
+
+## is_gravatar_ok( $email)  by Easunlee 2017
+sub is_gravatar_ok { 
+    my ($email) = @_;
+    require Digest::MD5;
+    my $md5 = Digest::MD5::md5_hex(lc($email)) ;
+    
+    my $image_url = "http://cn.gravatar.com/avatar/" . $md5 . '?s=50&d=404' ;
+    my $ua = MT->new_ua( { paranoid => 1 } )  or return;
+    my $resp = $ua->get($image_url);
+    return 0 unless $resp->is_success;
+    return 0 if $resp->code eq '404';
+    
+    my $image = $resp->content;
+    return $badimg unless $image;
+    my $mimetype = $resp->header('Content-Type');
+    return 0 unless $mimetype;
+    return 1  ;
+}
+## ---- End is_gravatar_ok
 
 sub _check_commenter_author {
     my $app = shift;
