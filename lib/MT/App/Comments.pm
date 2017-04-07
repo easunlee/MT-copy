@@ -1242,7 +1242,7 @@ sub is_gravatar_ok {
     my $md5 = Digest::MD5::md5_hex(lc($email)) ;
     
     my $image_url = "http://cn.gravatar.com/avatar/" . $md5 . '?s=50&d=404' ;
-    my $ua = MT->new_ua( { paranoid => 1 } )  or return;
+    my $ua = MT->new_ua( { paranoid => 1 } )  or return 0;
     my $resp = $ua->get($image_url);
     return 0 unless $resp->is_success;
     return 0 if $resp->code eq '404';
