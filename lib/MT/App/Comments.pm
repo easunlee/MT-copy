@@ -1965,7 +1965,9 @@ sub edit_commenter_profile {
         };
         $param->{ 'auth_mode_' . $commenter->auth_type } = 1;
         require MT::Auth;
-        $param->{'email_required'} = MT::Auth->can_recover_password ? 1 : 0;
+        $param->{'email_required'} = MT::Auth->can_recover_password ? 1 : 0;   
+             
+        $param->{'signin_ajax'} = $app->param('signin_ajax') ? 1 : 0;
 
         if (    ( $commenter->auth_type eq 'MT' )
             and ( $commenter->column('password') !~ /^\$6\$|{SHA}/ )
