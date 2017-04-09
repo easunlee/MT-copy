@@ -1931,13 +1931,6 @@ sub do_preview {
 
 sub edit_commenter_profile {
     my $app = shift;
-<<<<<<< HEAD
-    
-
-        
-=======
-
->>>>>>> parent of f852a3f... Update Comments.pm
     my ( $sess_obj, $commenter ) = $app->get_commenter_session();
     if ($commenter) {
         $app->user($commenter);
