@@ -1931,9 +1931,13 @@ sub do_preview {
 
 sub edit_commenter_profile {
     my $app = shift;
+<<<<<<< HEAD
     
 
         
+=======
+
+>>>>>>> parent of f852a3f... Update Comments.pm
     my ( $sess_obj, $commenter ) = $app->get_commenter_session();
     if ($commenter) {
         $app->user($commenter);
@@ -1982,8 +1986,7 @@ sub edit_commenter_profile {
                 "For improved security, please change your password");
         }
 
-        $tmpl->param($param);
-        return $tmpl;
+        return $app->build_page( 'profile.tmpl', $param );
     }
     return $app->handle_error( $app->translate('Invalid login') );
 }
