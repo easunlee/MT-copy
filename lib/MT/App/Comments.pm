@@ -1932,8 +1932,7 @@ sub do_preview {
 sub edit_commenter_profile {
     my $app = shift;
     
-    my $tmpl = $app->load_global_tmpl( 'profile_edit_form', $blog_id )
-        or return $app->errtrans("No profile edit form template defined");
+
         
     my ( $sess_obj, $commenter ) = $app->get_commenter_session();
     if ($commenter) {
@@ -1955,7 +1954,10 @@ sub edit_commenter_profile {
         }
 
         my $blog_id = $app->param('blog_id');
-
+        
+       my $tmpl = $app->load_global_tmpl( 'profile_edit_form', $blog_id )
+           or return $app->errtrans("No profile edit form template defined");
+        
         $app->user($commenter);
         my $param = {
             id       => $commenter->id,
