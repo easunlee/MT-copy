@@ -1,0 +1,1 @@
+https://github.com/easunlee/mt-plugin-qq-connect-commenters
