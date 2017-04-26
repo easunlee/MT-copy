@@ -1,8 +1,9 @@
 # SimpleComment 0.01 Copyright 2006 EasunLee Easun.org
 # SimpleComment 0.12 Copyright 2012 EasunLee Easun.org
-# A Simple plugin for Anti-Comment-SPAM plugin for Movable Type 3.*
+# SimpleComment 1.1 Copyright 2017 EasunLee Easun.org
+# A Simple plugin for Anti-Comment-SPAM plugin for Movable Type 3.*-5.*
 #
-# Copyright 2012 EasunLee Easun.org
+# Copyright 2017 EasunLee Easun.org
 # http://easun.org/
 # Using this software signifies your acceptance of the license
 # file that accompanies this software.
@@ -17,10 +18,11 @@ use warnings;
 use MT;
 use MT::Template::Context;
 
-use vars qw($MYNAME $VERSION $DEBUG );
+use vars qw($MYNAME $VERSION $DEBUG $Useproxy );
 $MYNAME = 'SimpleComment';
-$VERSION = "0.12";
+$VERSION = "1.1";
 $DEBUG = 0;
+$Useproxy = 1;
 
 # my $_SimpleCommentKey  = 'easun';
 # my $_SimpleCommentKeyValue = 'Go/and/down/easun.org/ossu/perl/exit/spamisbad/SimpleComment Random template modules Include plugin for Movable Type By EasunLee';
@@ -180,12 +182,20 @@ sub _hdlr_gravatar_url_mail {
        return  $no_img if ($email eq '');      
               
       require Digest::MD5;
-      my $md5_mail = Digest::MD5::md5_hex(lc($email)) ;
+      my $md5 = Digest::MD5::md5_hex(lc($email)) ;
+      
+      my $image_url = "https://cn.gravatar.com/avatar/" . $md5 . '?s=50&d=404' ;
+      my $image = &get_gravatar_content($image_url);
+      return  $no_img  unless  $image;
+      
+      my $cache_dir_url = MT->instance->support_directory_url .'avatar/';
+      return $cache_dir_url . $md5 . 'png?s=50'  if ($Useproxy) ;
+      
       
       my $local_path = File::Spec->catdir( MT->instance->support_directory_path, 'avatar' );
-      $local_path =~ s|/$||  unless $local_path eq  '/';  ## OS X doesn't like / at the end in mkdir().
-      my $cache_file_main =  File::Spec->catfile( $local_path, $md5_mail);
-      my $cache_dir_url = MT->instance->support_directory_url .'avatar/' ;
+            $local_path =~ s|/$||  unless $local_path eq  '/';  ## OS X doesn't like / at the end in mkdir().
+            
+      my $cache_file_main =  File::Spec->catfile( $local_path, $md5);      
       
       my $ext ='.png'; #先设置后缀为 png,因为检查机制不知道图像类型。
       
@@ -199,25 +209,29 @@ sub _hdlr_gravatar_url_mail {
 #      }
 #      
       my $cache_file = $cache_file_main . $ext ;      
-      my $cache_file_url= $cache_dir_url . $md5_mail . $ext ; 
+      my $cache_file_url= $cache_dir_url . $md5 . $ext ; 
       
+      unless ( $fmgr->exists($local_path) ) { $fmgr->mkpath($local_path); }      
       if ( $fmgr->exists($cache_file) ) {                
-        my $mtime    = $fmgr->file_mod_time( $cache_file );
-        my $INTERVAL = 60 * 60 * 24 * 7;
-        if ( $mtime > time - $INTERVAL ) {
-            # newer than 7 days ago, don't download the userpic
-            return $cache_file_url;
-        }
-        $fmgr->delete($cache_file);  #超过7天啦。删除。
-      }
-    my $locimg = &_get_from_gravatar_noassetset( $md5_mail, $local_path,$cache_dir_url);
-    return $locimg ? $locimg : $no_img;
+	        my $mtime    = $fmgr->file_mod_time( $cache_file );
+	        my $INTERVAL = 60 * 60 * 24 * 7;
+	        if ( $mtime > time - $INTERVAL ) {
+	            # newer than 7 days ago, don't download the userpic
+	            return $cache_file_url;
+	        }
+	        $fmgr->delete($cache_file);  #超过7天啦。删除。
+	      }
+	      
+    # 重新上传。
+    my $local_img   = File::Spec->catfile( $local_path, $md5 . $ext );
+    $fmgr->put_data( $image, $local_img, 'upload' );
+        
+    return $cache_file_url;
 }
 
-sub _get_from_gravatar_noassetset { 
-    my ($md5,$local_path,$cache_dir_url) = @_;
-#    my $image_url = "http://cn.gravatar.com/avatar/" . $md5 . '?s=50&d=identicon' ;
-    my $image_url = "http://cn.gravatar.com/avatar/" . $md5 . '?s=50&d=404' ;
+sub get_gravatar_content { 
+    my ($image_url) = @_;
+    # my $image_url = "https://cn.gravatar.com/avatar/" . $md5 . '?s=50&d=404' ;
     my $ua = MT->new_ua( { paranoid => 1 } )  or return undef ;
     my $resp = $ua->get($image_url);
     return undef unless $resp->is_success;
@@ -226,23 +240,8 @@ sub _get_from_gravatar_noassetset {
     my $image = $resp->content;
     return undef unless $image;
     my $mimetype = $resp->header('Content-Type');
-    return undef unless $mimetype;
-#    my $ext = {
-#        'image/jpeg' => '.jpg',
-#        'image/png'  => '.png',
-#        'image/gif'  => '.gif'
-#    }->{$mimetype};
-#    
-#    unless ($ext) { $ext ='.png'; } #如果没有获取到 mimetype 强行设置为 png 
-      my $ext ='.png';   # 强行设置为 png 
-
-    require MT::FileMgr;
-    my $fmgr = MT::FileMgr->new('Local');
-    
-    unless ( $fmgr->exists($local_path) ) { $fmgr->mkpath($local_path); }
-    my $local_img   = File::Spec->catfile( $local_path, $md5 . $ext );
-    $fmgr->put_data( $image, $local_img, 'upload' );
-    return $cache_dir_url . $md5 . $ext  ;
+    return undef unless $mimetype;    
+    return $image;
 }
 
 

@@ -118,7 +118,22 @@ sub search_terms {
     $limit = $max if !$limit || ( $limit - $offset > $max );
 
     my $tag_class = $app->model('tag');
-    my $search_string = $q->param('tag') || $q->param('search');
+#    my $search_string = $q->param('tag') || $q->param('search');
+    
+#-------  By EasunLee 2017-04-24--- get page
+my $path_info =  $q->param('tag');
+if ( $path_info )
+{
+     $path_info =~s{^/}{};
+     $path_info =~s{/}{;}g;     
+    (my $tag, my $tag_page, my $r) = split ';', $path_info; 
+    $tag_page  = 1 if ($tag_page !~ /^[0-9]+$/);
+    $tag_page = 1 if ($tag_page  == 0);
+    $path_info = $tag; 
+}   
+#--------   
+    my $search_string = $path_info || $q->param('search');
+
     $app->{search_string} = $search_string;
 
     my @or_tag_names;

@@ -103,7 +103,22 @@ sub init_request {
     my $blog = $app->model('blog')->load($blog_id)
         or return $app->errtrans( 'Cannot load blog #[_1].',
         MT::Util::encode_html($blog_id) );
-    my $page = $q->param('page') ? $q->param('page') : 1;
+        
+#-------  By EasunLee 2017-04-24
+my $tag_page = 1; 
+if ($q->param('tag') )
+{
+my $path_info =  $q->param('tag');
+     $path_info =~s{^/}{};
+     $path_info =~s{/}{;}g;
+     
+(my $tag, $tag_page, my $r) = split ';', $path_info;  
+    $tag_page  = 1 if ($tag_page !~ /^[0-9]+$/);
+    $tag_page = 1 if ($tag_page  == 0);
+}    
+#--------        
+        
+    my $page = $q->param('page') ? $q->param('page') : $tag_page;
     my $limit
         = $q->param('limit') ? $q->param('limit')
         : (
