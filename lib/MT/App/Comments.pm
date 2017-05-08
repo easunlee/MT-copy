@@ -1248,12 +1248,13 @@ sub is_gravatar_ok {
     my $resp = $ua->get($image_url);
     return 0 unless $resp->is_success;
     return 0 if $resp->code eq '404';
-    
-    my $image = $resp->content;
-    return 0 unless $image;
-    my $mimetype = $resp->header('Content-Type');
-    return 0 unless $mimetype;
-    return 1  ;
+#   
+#    my $image = $resp->content;
+#    return 0 unless $image;
+#    my $mimetype = $resp->header('Content-Type');
+#    return 0 unless $mimetype;
+# 
+    return 1;
 }
 ## ---- End is_gravatar_ok
 

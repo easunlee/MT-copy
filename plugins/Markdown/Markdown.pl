@@ -181,12 +181,15 @@ sub Markdown {
     # match consecutive blank lines with /\n+/ instead of something
     # contorted like /[ \t]*\n+/ .
     $text =~ s/^[ \t]+$//mg;
+    
+    $text = _DoCodeBlocks_github($text);    
 
     # Turn block-level HTML blocks into hash entries
     $text = _HashHTMLBlocks($text);
 
     # Strip link definitions, store in hashes.
-    $text = _StripLinkDefinitions($text);
+    $text = _StripLinkDefinitions($text);   
+     
 
     $text = _RunBlockGamut($text);
 
@@ -360,6 +363,8 @@ sub _RunBlockGamut {
     # tags like paragraphs, headers, and list items.
     #
     my $text = shift;
+    
+ #   $text = _DoCodeBlocks_github($text);    
 
     $text = _DoHeaders($text);
 
@@ -370,6 +375,7 @@ sub _RunBlockGamut {
         =~ s{^[ ]{0,2}([ ]? -[ ]?){3,}[ \t]*$}{\n<hr$g_empty_element_suffix\n}gmx;
     $text
         =~ s{^[ ]{0,2}([ ]? _[ ]?){3,}[ \t]*$}{\n<hr$g_empty_element_suffix\n}gmx;
+        
 
     $text = _DoLists($text);
 
@@ -390,8 +396,8 @@ sub _RunBlockGamut {
 
 sub _easunCode {
     my $text = shift;
-    $text =~ s/<pre><code>\`\`\`(.*)$/<pre><code class=\"language-$1\">/g;
-    $text =~ s/<pre><code>/<pre><code class=\"language-perl\">/g;
+    $text =~ s{<pre><code>```(.*?)\n}{<pre><b class=\"name\">$1<\/b><code class=\"language-$1\">}g; 
+    $text =~ s/<pre><code>/<pre><b class=\"name\">CODE<\/b><code class=\"code\">/g;
     return $text;
 }
 
@@ -962,6 +968,40 @@ sub _DoCodeBlocks {
 
             $result;
         }egmx;
+        
+
+    return $text;
+}
+
+sub _DoCodeBlocks_github {
+
+    #
+    #   Process Markdown `<pre><code>` blocks.
+    #
+
+    my $text = shift;
+
+    $text =~ s{
+               (?:\n\n|\A)
+               ```(\w+)\n
+               (.+?)
+               \n```
+               (?:\n|\Z)
+               }{
+            my $codeType = $1;
+            my $codeblock = $2;
+            my $result; # return value
+
+            $codeblock = _EncodeCode(_Outdent($codeblock));
+            $codeblock = _Detab($codeblock);
+            $codeblock =~ s/\A\n+//; # trim leading newlines
+            $codeblock =~ s/\s+\z//; # trim trailing whitespace  
+
+            $result = '\n\n<pre><code>```' .$codeType .'\n' . $codeblock . "\n</code></pre>\n\n";
+
+            $result;
+        }egmx;
+        
 
     return $text;
 }
