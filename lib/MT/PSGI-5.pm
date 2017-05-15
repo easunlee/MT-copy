@@ -1,4 +1,4 @@
-# Movable Type (r) (C) 2001-2017 Six Apart, Ltd. All Rights Reserved.
+# Movable Type (r) (C) 2001-2013 Six Apart, Ltd. All Rights Reserved.
 # This code cannot be redistributed without permission from www.sixapart.com.
 # For more information, consult your Movable Type license.
 #
@@ -9,7 +9,7 @@ package MT::PSGI;
 use strict;
 use warnings;
 use parent qw(Plack::Component);
-use Plack::Util::Accessor qw(script application _app);
+use Plack::Util::Accessor qw(script application url _app);
 use MT;
 use MT::Component;
 use Carp;
@@ -182,9 +182,7 @@ sub run_cgi_without_buffering {
 sub prepare_app {
     my $self = shift;
     my $app;
-    if ( $self->application
-        && !$self->is_restricted_app( $self->application ) )
-    {
+    if ( $self->application ) {
         $app = $self->make_app( $self->application );
     }
     else {
@@ -195,12 +193,9 @@ sub prepare_app {
 }
 
 sub application_list {
-    my ($self) = @_;
-    my $reg    = MT::Component->registry('applications');
-    my %apps   = map {
-        my $app = $_;
+    my $reg  = MT::Component->registry('applications');
+    my %apps = map {
         map { $_ => 1 }
-            grep { $app->{$_}->{script} && !$self->is_restricted_app($_) }
             keys %$_
     } @$reg;
     keys %apps;
@@ -211,7 +206,7 @@ sub make_app {
     my ($app) = @_;
     $app = MT->registry( applications => $app ) unless ref $app;
     Carp::croak('No application is specified') unless $app;
-    my $script = $self->{script} || $app->{script} or return;
+    my $script = $self->{script} || $app->{script};
     $script = MT->handler_to_coderef($script) unless ref $script;
     $script = $script->();
     my $type = $app->{type} || '';
@@ -245,8 +240,7 @@ sub mount_applications {
     my (@applications) = @_;
     my $urlmap         = Plack::App::URLMap->new;
     for my $app_id (@applications) {
-        my $app;
-        $app = MT->registry( applications => $app_id ) unless ref $app_id;
+        my $app = MT->registry( applications => $app_id ) unless ref $app_id;
         Carp::croak('No application is specified') unless $app;
         my $base = $app->{cgi_path};
         if ($base) {
@@ -258,12 +252,12 @@ sub mount_applications {
         }
         $base =~ s!/$!!;
         $base =~ s!^https?://[^/]*!!;
-        my $script = $app->{script} or next;
+        my $script = $app->{script};
         $script = MT->handler_to_coderef($script) unless ref $script;
         $script = $script->();
         $script =~ s!^/!!;
-        my $url = $base . '/' . $script;
-        my $psgi_app = $self->make_app($app) or next;
+        my $url      = $base . '/' . $script;
+        my $psgi_app = $self->make_app($app);
         $psgi_app = $self->apply_plack_middlewares( $app_id, $psgi_app );
         $urlmap->map( $url, $psgi_app );
     }
@@ -286,8 +280,8 @@ sub mount_applications {
     my $static = $staticpath;
     $static .= '/' unless $static =~ m!/$!;
     my $favicon = $static . 'images/favicon.ico';
-    $urlmap->map( '/favicon.ico' =>
-            Plack::App::File->new( { file => $favicon } )->to_app );
+    $urlmap->map(
+        '/favicon.ico' => Plack::App::File->new( { file => $favicon } )->to_app );
 
     $self->_app( $urlmap->to_app );
 }
@@ -339,11 +333,6 @@ sub apply_plack_middlewares {
 sub call {
     my ( $self, $env ) = @_;
     $self->_app->($env);
-}
-
-sub is_restricted_app {
-    my ( $self, $app ) = @_;
-    ( grep { $app eq $_ } $mt->config->RestrictedPSGIApp ) ? 1 : 0;
 }
 
 1;
@@ -500,24 +489,6 @@ for example:
           apply_to:
               - cms
               - upgrade
-
-=back
-
-=head1 CONFIG_DIRECTIVE
-
-=over 4
-
-=item RestrictedPSGIApp
-
-If you want to restrict application, you can do it by setting config directive
-"RestrictedPSGIApp" with application's ID. For example:
-
-=over 8
-
-    RestrictedPSGIApp  cms
-    RestrictedPSGIApp  upgrade
-
-=back
 
 =back
 
