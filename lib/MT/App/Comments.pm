@@ -1242,10 +1242,12 @@ sub is_gravatar_ok {
     my $md5 = Digest::MD5::md5_hex(lc($email)) ;
     
     return 1 if ($md5 eq 'fe1200b1ba0bdb37a336f20bec418406');
+    return 1 if ($md5 eq 'd55a62d48528ed03ab97dba341a6859d');
     
-    my $image_url = "http://cn.gravatar.com/avatar/" . $md5 . '?s=50&d=404' ;
-    my $ua = MT->new_ua( { paranoid => 1 } )  or return 0;
-    my $resp = $ua->get($image_url);
+    my $image_url = "https://cn.gravatar.com/avatar/" . $md5 . '?s=50&d=404' ;
+    my $ua = MT->new_ua; ##or return 0;
+          $ua->agent("Mozilla/5.0 (Windows NT 10.0; WOW64; rv:53.0) Gecko/20100101 Firefox/53.0") ; ##or return 0;
+   my $resp = $ua->get($image_url);
     return 0 unless $resp->is_success;
     return 0 if $resp->code eq '404';
 #   
